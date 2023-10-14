@@ -26,7 +26,7 @@ public record Promotion
     public DateTimeOffset? ApprovedByCEO { get; set; }
 
     /// <summary>
-    /// By Marten convention this method needs to be named Apply. Acts more as "Evolve".
+    /// By Marten convention this method needs to be named Apply.
     /// Restores state by applying the fact.
     /// Works as the documentation for state transition!
     /// </summary>
