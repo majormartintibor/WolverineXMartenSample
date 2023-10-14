@@ -1,5 +1,4 @@
 ﻿using Marten;
-using Marten.Internal.Sessions;
 using Wolverine;
 using Wolverine.Http;
 
