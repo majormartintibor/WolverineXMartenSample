@@ -5,7 +5,7 @@ public interface IDateTimeOffsetProvider
     public DateTimeOffset GetCurrentDateTimeOffset();
 }
 
-public class DateTimeOffsetProvider : IDateTimeOffsetProvider
+public sealed class DateTimeOffsetProvider : IDateTimeOffsetProvider
 {
     public DateTimeOffset GetCurrentDateTimeOffset()
     {

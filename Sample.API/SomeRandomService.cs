@@ -7,7 +7,7 @@ public interface ISomeRandomService
     void DoSomething();
 }
 
-public class SomeRandomService : ISomeRandomService
+public sealed class SomeRandomService : ISomeRandomService
 {
     public void DoSomething()
     {

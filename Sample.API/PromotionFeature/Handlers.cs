@@ -1,5 +1,6 @@
 ﻿using Marten;
 using Wolverine.Marten;
+using static Sample.API.PromotionFeature.Promotion;
 using static Sample.API.PromotionFeature.PromotionFact;
 
 namespace Sample.API.PromotionFeature;
@@ -25,10 +26,10 @@ public static class SupervisorRespondsHandler
     public static IEnumerable<object> Handle(
         SupervisorResponds intent, Promotion promotion, ISomeRandomService someRandomService)
     {
-        if (promotion.Closed)
+        if(promotion is not OpenedPromotion)
         {
-            throw new InvalidOperationException("The promoting process is already closed!");
-        }
+            throw new InvalidOperationException("Promotion is in an invalid state!");
+        }        
 
         if (!intent.Verdict)
         {
@@ -58,9 +59,9 @@ public static class HRRespondsHandler
     [AggregateHandler]
     public static IEnumerable<object> Handle(HRResponds intent, Promotion promotion)
     {
-        if (promotion.Closed)
+        if (promotion is not PassedSupervisorApproval)
         {
-            throw new InvalidOperationException("The promoting process is already closed!");
+            throw new InvalidOperationException("Promotion is in an invalid state!");
         }
 
         if (!intent.Verdict)
@@ -80,9 +81,9 @@ public static class CEORespondsHandler
     [AggregateHandler]
     public static IEnumerable<object> Handle(CEOResponds intent, Promotion promotion)
     {
-        if (promotion.Closed)
+        if (promotion is not PassedHRApproval)
         {
-            throw new InvalidOperationException("The promoting process is already closed!");
+            throw new InvalidOperationException("Promotion is in an invalid state!");
         }
 
         if (!intent.Verdict)

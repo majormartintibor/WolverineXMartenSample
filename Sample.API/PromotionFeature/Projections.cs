@@ -5,6 +5,9 @@ using static Sample.API.PromotionFeature.PromotionFact;
 
 namespace Sample.API.PromotionFeature;
 
+/// <summary>
+/// Serves to show the Promotee the status of their Promotion request
+/// </summary>
 public sealed record PromotionStatus(
     Guid Id,
     string Promotee,
@@ -15,16 +18,21 @@ public sealed record PromotionStatus(
     {
     }
 
-    public PromotionStatus Apply(PromotionRequested requested)
-        => this with { Promotee = requested.Promotee, Id = requested.PromotionId };
+    public PromotionStatus Apply(PromotionFact @fact) =>
+        @fact switch
+        {
+            PromotionRequested(Guid promotionId, string promotee) =>
+                this with { Id = promotionId, Promotee = promotee },
 
-    public PromotionStatus Apply(PromotionClosedWithRejection rejected)
-        => this with { Status = Status.ClosedAndRejected };
+            PromotionClosedWithRejection =>
+                this with { Status = Status.ClosedAndRejected},
 
-    public PromotionStatus Apply(PromotionClosedWithAcceptance accepted)
-        => this with { Status = Status.ClosedAndApproved };
+            PromotionClosedWithAcceptance =>
+                this with { Status = Status.ClosedAndApproved},
+
+            _ => this
+        };
 }
-
 public enum Status
 {
     Pending,
@@ -40,17 +48,14 @@ public enum Status
 public sealed class PromotionStatusProjection
     : SingleStreamProjection<PromotionStatus>
 {
-    public PromotionStatus Apply(PromotionRequested requested, PromotionStatus current)
-        => current.Apply(requested);
-
-    public PromotionStatus Apply(PromotionClosedWithRejection rejected, PromotionStatus current)
-        => current.Apply(rejected);
-
-    public PromotionStatus Apply(PromotionClosedWithAcceptance accepted, PromotionStatus current)
-        => current.Apply(accepted);
+    public PromotionStatus Apply(PromotionFact fact, PromotionStatus current)
+        => current.Apply(fact);
 }
 
 
+/// <summary>
+/// This would require some elevated rights to see, not meant for the Promotee
+/// </summary>
 public sealed record PromotionDetails(
     Guid Id,
     string Promotee,
@@ -67,64 +72,45 @@ public sealed record PromotionDetails(
     {
     }
 
-    public PromotionDetails Apply(PromotionRequested requested)
-        => this with
+    public PromotionDetails Apply(PromotionFact @fact) =>
+        fact switch
         {
-            Id = requested.PromotionId,
-            Promotee = requested.Promotee,
-            RejectedAt = null,
-            AcceptedAt = null,
-            ApprovedBySupervisor = null,
-            ApprovedByHR = null,
-            ApprovedByCEO = null
+            PromotionRequested(Guid promotionId, string promotee) =>
+                this with { Id = promotionId, Promotee = promotee },
+
+            ApprovedBySupervisor(DateTimeOffset approvedAt) =>
+                this with { ApprovedBySupervisor = approvedAt },
+
+            ApprovedByHR(DateTimeOffset approvedAt) =>
+                this with { ApprovedByHR = approvedAt },
+
+            ApprovedByCEO(DateTimeOffset approvedAt) =>
+                this with { ApprovedByCEO = approvedAt, AcceptedAt = approvedAt },
+
+            RejectedBySupervisor(DateTimeOffset rejectedAt) =>
+                this with { RejectedAt = rejectedAt },
+
+            RejectedByHR(DateTimeOffset rejectedAt) =>
+                this with { RejectedAt = rejectedAt},
+
+            RejectedByCEO(DateTimeOffset rejectedAt) =>
+                this with { RejectedAt = rejectedAt },
+
+            PromotionClosedWithRejection =>
+                this with { Closed = true },
+
+            PromotionClosedWithAcceptance => 
+                this with { Closed = true },
+
+            _ => this
         };
-
-    public PromotionDetails Apply(RejectedBySupervisor rejected)
-        => this with { RejectedAt = rejected.RejectedAt };
-    public PromotionDetails Apply(ApprovedBySupervisor approved)
-        => this with { ApprovedBySupervisor = approved.ApprovedAt };
-
-    public PromotionDetails Apply(RejectedByHR rejected)
-        => this with { RejectedAt = rejected.RejectedAt };
-
-    public PromotionDetails Apply(ApprovedByHR approved)
-        => this with { ApprovedByHR = approved.ApprovedAt };
-
-    public PromotionDetails Apply(RejectedByCEO rejected)
-        => this with { RejectedAt = rejected.RejectedAt };
-
-    public PromotionDetails Apply(ApprovedByCEO approved)
-        => this with { ApprovedByCEO = approved.ApprovedAt };
-
-    public PromotionDetails Apply(PromotionClosedWithRejection rejected)
-        => this with { Closed = true };
-
-    public PromotionDetails Apply(PromotionClosedWithAcceptance approved)
-        => this with { Closed = true };
 }
+
 public sealed class PromotionDetailsProjection
     : SingleStreamProjection<PromotionDetails>
 {
-    public PromotionDetails Apply(PromotionRequested requested, PromotionDetails current)
-        => current.Apply(requested);
-
-    public PromotionDetails Apply(RejectedBySupervisor rejected, PromotionDetails current)
-        => current.Apply(rejected);
-
-    public PromotionDetails Apply(ApprovedBySupervisor approved, PromotionDetails current)
-        => current.Apply(approved);
-
-    public PromotionDetails Apply(RejectedByHR rejected, PromotionDetails current)
-        => current.Apply(rejected);
-
-    public PromotionDetails Apply(ApprovedByHR approved, PromotionDetails current)
-        => current.Apply(approved);
-
-    public PromotionDetails Apply(RejectedByCEO rejected, PromotionDetails current)
-        => current.Apply(rejected);
-
-    public PromotionDetails Apply(ApprovedByCEO approved, PromotionDetails current)
-        => current.Apply(approved);
+    public PromotionDetails Apply(PromotionFact fact, PromotionDetails current)
+        => current.Apply(fact);
 }
 
 
