@@ -3,7 +3,7 @@ using FluentValidation.Results;
 using JasperFx.Core;
 using Wolverine.FluentValidation;
 
-namespace Sample.API;
+namespace Sample.API.PromotionFeature;
 
 public sealed class RequestPromotionValidator : AbstractValidator<RequestPromotion>
 {

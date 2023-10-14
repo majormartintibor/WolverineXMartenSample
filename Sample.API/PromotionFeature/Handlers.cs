@@ -1,7 +1,8 @@
 ﻿using Marten;
 using Wolverine.Marten;
+using static Sample.API.PromotionFeature.PromotionFact;
 
-namespace Sample.API;
+namespace Sample.API.PromotionFeature;
 
 public sealed class RequestPromotionHandler
 {
@@ -12,7 +13,7 @@ public sealed class RequestPromotionHandler
         session.Events
             .StartStream<Promotion>(id, new PromotionRequested(id, intent.Promotee));
 
-        await session.SaveChangesAsync();        
+        await session.SaveChangesAsync();
 
         return id;
     }
@@ -21,8 +22,9 @@ public sealed class RequestPromotionHandler
 public static class SupervisorRespondsHandler
 {
     [AggregateHandler]
-    public static IEnumerable<object> Handle(SupervisorResponds intent, Promotion promotion)
-    { 
+    public static IEnumerable<object> Handle(
+        SupervisorResponds intent, Promotion promotion, ISomeRandomService someRandomService)
+    {
         if (promotion.Closed)
         {
             throw new InvalidOperationException("The promoting process is already closed!");
@@ -33,17 +35,21 @@ public static class SupervisorRespondsHandler
             yield return new RejectedBySupervisor(intent.DecisionMadeAt);
             yield return new PromotionClosedWithRejection();
             yield break;
-        }
+        }        
 
         ApprovedBySupervisor approved = new(intent.DecisionMadeAt);
-        yield return approved;
-
-        promotion.Apply(approved);
-
-        if (promotion.ApprovedByAll)
+        
+        //Just showing here some concepts you can do:
+        //1. You can use method injection to inject some service you might need for some business logic
+        //2. You are getting the last state reconstructed in memory from the facts
+        //3. You can apply a new fact and check the sate it will produce to make further decisions
+        var newState = promotion.Apply(approved);
+        if (newState.ApprovedBySupervisor != null)
         {
-            yield return new PromotionClosedWithAcceptance();
+            someRandomService.DoSomething();
         }
+
+        yield return approved;
     }
 }
 
@@ -63,16 +69,9 @@ public static class HRRespondsHandler
             yield return new PromotionClosedWithRejection();
             yield break;
         }
-        
+
         ApprovedByHR approved = new(intent.DecisionMadeAt);
         yield return approved;
-
-        promotion.Apply(approved);
-
-        if (promotion.ApprovedByAll)
-        {
-            yield return new PromotionClosedWithAcceptance();
-        }
     }
 }
 
@@ -91,17 +90,11 @@ public static class CEORespondsHandler
             yield return new RejectedByCEO(intent.DecisionMadeAt);
             yield return new PromotionClosedWithRejection();
             yield break;
-        }       
+        }
 
         ApprovedByCEO approved = new(intent.DecisionMadeAt);
         yield return approved;
-
-        promotion.Apply(approved);
-
-        if (promotion.ApprovedByAll)
-        {
-            yield return new PromotionClosedWithAcceptance();
-        }
+        yield return new PromotionClosedWithAcceptance();
     }
 }
 

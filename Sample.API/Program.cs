@@ -2,6 +2,7 @@ using JasperFx.Core;
 using Marten;
 using Marten.Exceptions;
 using Sample.API;
+using Sample.API.PromotionFeature;
 using Weasel.Core;
 using Wolverine;
 using Wolverine.ErrorHandling;
@@ -44,6 +45,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IDateTimeOffsetProvider, DateTimeOffsetProvider>();
+builder.Services.AddScoped<ISomeRandomService, SomeRandomService>();
 
 var app = builder.Build();
 
@@ -53,8 +55,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
 
 app.MapPromotionEndpoints();
 

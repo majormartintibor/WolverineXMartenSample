@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Wolverine;
+﻿using Wolverine;
 
-namespace Sample.API;
+namespace Sample.API.PromotionFeature;
 
 public static class Endpoints
 {
@@ -34,7 +33,7 @@ public static class Endpoints
             (Guid Id, IMessageBus bus) => bus.InvokeAsync<PromotionDetails?>(new RequestPromotionDetails(Id)));
 
         promotionEndpoints.MapGet(
-            "/VersionedDetails",            
+            "/VersionedDetails",
             (Guid Id, int Version, IMessageBus bus)
                 => bus.InvokeAsync<PromotionDetails?>(new RequestPromotionDetailsWithVersion(Id, Version)));
     }

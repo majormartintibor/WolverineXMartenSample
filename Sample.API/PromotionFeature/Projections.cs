@@ -1,8 +1,9 @@
 ﻿using Marten;
 using Marten.Events.Aggregation;
 using Marten.Events.Projections;
+using static Sample.API.PromotionFeature.PromotionFact;
 
-namespace Sample.API;
+namespace Sample.API.PromotionFeature;
 
 public sealed record PromotionStatus(
     Guid Id,
@@ -11,11 +12,11 @@ public sealed record PromotionStatus(
 {
     public PromotionStatus()
         : this(Guid.Empty, string.Empty, Status.Pending)
-    {        
+    {
     }
 
-    public PromotionStatus Apply(PromotionRequested requested)    
-        =>  this with { Promotee = requested.Promotee, Id = requested.PromotionId };
+    public PromotionStatus Apply(PromotionRequested requested)
+        => this with { Promotee = requested.Promotee, Id = requested.PromotionId };
 
     public PromotionStatus Apply(PromotionClosedWithRejection rejected)
         => this with { Status = Status.ClosedAndRejected };
@@ -33,7 +34,9 @@ public enum Status
 
 //This pattern to call the Apply method of the Detail is useful
 //as aggregate Stream gives option to pass either timestamp or version
-//to do time travel.
+//to do time travel. Aggregate stream will call the apply method of
+//PromotionStatus while the .Query calls will call the Apply method
+//of PromotionStatusProjection
 public sealed class PromotionStatusProjection
     : SingleStreamProjection<PromotionStatus>
 {
@@ -58,14 +61,15 @@ public sealed record PromotionDetails(
     DateTimeOffset? ApprovedByCEO,
     bool Closed)
 {
-    public PromotionDetails() 
+    public PromotionDetails()
         : this(Guid.Empty, string.Empty,
               null, null, null, null, null, false)
-    {        
+    {
     }
 
     public PromotionDetails Apply(PromotionRequested requested)
-        => this with { 
+        => this with
+        {
             Id = requested.PromotionId,
             Promotee = requested.Promotee,
             RejectedAt = null,
