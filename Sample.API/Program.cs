@@ -7,6 +7,7 @@ using Weasel.Core;
 using Wolverine;
 using Wolverine.ErrorHandling;
 using Wolverine.FluentValidation;
+using Wolverine.Http;
 using Wolverine.Marten;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,5 +58,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapPromotionEndpoints();
+app.MapWolverineEndpoints();
 
 await app.RunAsync();
