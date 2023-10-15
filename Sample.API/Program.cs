@@ -1,6 +1,7 @@
 using JasperFx.Core;
 using Marten;
 using Marten.Exceptions;
+using Npgsql;
 using Sample.API;
 using Sample.API.PromotionFeature;
 using Weasel.Core;
@@ -19,23 +20,41 @@ builder.Services.AddMarten(opts =>
     opts.Connection(connectionString);
 
     opts.AutoCreateSchemaObjects = AutoCreate.All;
-    opts.DatabaseSchemaName = "promotion";
+    opts.DatabaseSchemaName = "promotion";    
 
     opts.AddPromotionProjections();
 }).UseLightweightSessions()
 
     // Adding the Wolverine integration for Marten.
-    .IntegrateWithWolverine();
+    .IntegrateWithWolverine()
+    .EventForwardingToWolverine();
 
 builder.Host.UseWolverine(opts =>
 {
+    opts.PublishMessage<SendPromotionAcceptedNotification>()        
+        .ToLocalQueue("promotionaccepted")
+        .UseDurableInbox();
+
+    opts.PublishMessage<SendPromotionRejectedNotification>()
+        .ToLocalQueue("promotionrejected")        
+        .UseDurableInbox();
+
     // Retry policies if a Marten concurrency exception is encountered
     opts.OnException<ConcurrencyException>()
         .RetryOnce()
         .Then.RetryWithCooldown(100.Milliseconds(), 250.Milliseconds())
-    .Then.Discard();
+        .Then.Discard();
 
-    opts.UseFluentValidation();
+    //Retry for infrastructure hiccups
+    opts.Policies.OnException<NpgsqlException>()
+        .RetryWithCooldown(50.Milliseconds(), 100.Milliseconds(), 250.Milliseconds());    
+
+    // Automatic usage of transactional middleware as 
+    // Wolverine recognizes that an HTTP endpoint or message handler
+    // persists data
+    opts.Policies.AutoApplyTransactions();
+
+    opts.UseFluentValidation();    
 
     opts.Services.AddSingleton(typeof(IFailureAction<>), typeof(CustomFailureAction<>));
 });
