@@ -1,5 +1,4 @@
 ﻿using Marten;
-using System.Diagnostics;
 using Wolverine;
 using Wolverine.Marten;
 using static Sample.API.PromotionModule.Promotion;
@@ -77,6 +76,8 @@ public static class HRRespondsHandler
             yield return new RejectedByHR(intent.DecisionMadeAt);
             yield return new PromotionClosedWithRejection();
             //Send message that the promotion has been rejected
+            //Showing here that sendig a message can also be done with
+            //tatic IEnumerable<object> Handle signature. 
             yield return new SendPromotionRejectedNotification(promotion.Promotee);
             yield break;
         }
