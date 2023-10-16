@@ -2,7 +2,7 @@
 
 public abstract record PromotionFact
 {
-    public sealed record PromotionRequested(Guid PromotionId, string Promotee) : PromotionFact;
+    public sealed record PromotionOpened(Guid PromotionId, string Promotee) : PromotionFact;
     public sealed record ApprovedBySupervisor(DateTimeOffset ApprovedAt) : PromotionFact;
     public sealed record RejectedBySupervisor(DateTimeOffset? RejectedAt) : PromotionFact;
     public sealed record ApprovedByHR(DateTimeOffset ApprovedAt) : PromotionFact;

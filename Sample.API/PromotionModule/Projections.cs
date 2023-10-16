@@ -21,7 +21,7 @@ public sealed record PromotionStatus(
     public PromotionStatus Apply(PromotionFact @fact) =>
         @fact switch
         {
-            PromotionRequested(Guid promotionId, string promotee) =>
+            PromotionOpened(Guid promotionId, string promotee) =>
                 this with { Id = promotionId, Promotee = promotee },
 
             PromotionClosedWithRejection =>
@@ -75,7 +75,7 @@ public sealed record PromotionDetails(
     public PromotionDetails Apply(PromotionFact @fact) =>
         fact switch
         {
-            PromotionRequested(Guid promotionId, string promotee) =>
+            PromotionOpened(Guid promotionId, string promotee) =>
                 this with { Id = promotionId, Promotee = promotee },
 
             ApprovedBySupervisor(DateTimeOffset approvedAt) =>

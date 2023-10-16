@@ -35,7 +35,7 @@ public record Promotion
     public Promotion Apply(PromotionFact @fact) =>
         @fact switch
         {
-            PromotionRequested(Guid promotionId, string promotee) =>
+            PromotionOpened(Guid promotionId, string promotee) =>
                 new OpenedPromotion { Id = promotionId, Promotee = promotee },
 
             ApprovedBySupervisor(DateTimeOffset approvedAt) =>

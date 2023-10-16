@@ -8,12 +8,12 @@ namespace Sample.API.PromotionModule;
 
 public sealed class RequestPromotionHandler
 {
-    public async Task<Guid> Handle(RequestPromotion intent, IDocumentSession session)
+    public async Task<Guid> Handle(RequestPromotion request, IDocumentSession session)
     {
         var id = Guid.NewGuid();
 
         session.Events
-            .StartStream<Promotion>(id, new PromotionRequested(id, intent.Promotee));
+            .StartStream<Promotion>(id, new PromotionOpened(id, request.Promotee));
 
         await session.SaveChangesAsync();
 
@@ -25,12 +25,12 @@ public static class SupervisorRespondsHandler
 {
     [AggregateHandler]
     public static (Events, OutgoingMessages) Handle(
-        SupervisorResponds intent, Promotion promotion, ISomeRandomService someRandomService)
+        SupervisorResponds intent, Promotion state, ISomeRandomService someRandomService)
     {
         var messages = new OutgoingMessages();
         var events = new Events();
 
-        if (promotion is not OpenedPromotion)
+        if (state is not OpenedPromotion)
         {
             throw new InvalidOperationException("Promotion is in an invalid state!");
         }
@@ -40,7 +40,7 @@ public static class SupervisorRespondsHandler
             events += new RejectedBySupervisor(intent.DecisionMadeAt);
             events += new PromotionClosedWithRejection();
             //Send message that the promotion has been rejected
-            messages.Add(new SendPromotionRejectedNotification(promotion.Promotee));
+            messages.Add(new SendPromotionRejectedNotification(state.Promotee));
             return (events, messages);
         }
 
@@ -51,7 +51,7 @@ public static class SupervisorRespondsHandler
         //1. You can use method injection to inject some service you might need for some business logic
         //2. You are getting the last state reconstructed in memory from the facts
         //3. You can apply a new fact and check the sate it will produce to make further decisions
-        var newState = promotion.Apply(approved);
+        var newState = state.Apply(approved);
         if (newState.ApprovedBySupervisor != null)
         {
             someRandomService.DoSomething();
@@ -64,9 +64,9 @@ public static class SupervisorRespondsHandler
 public static class HRRespondsHandler
 {
     [AggregateHandler]
-    public static IEnumerable<object> Handle(HRResponds intent, Promotion promotion)
+    public static IEnumerable<object> Handle(HRResponds intent, Promotion state)
     {
-        if (promotion is not PassedSupervisorApproval)
+        if (state is not PassedSupervisorApproval)
         {
             throw new InvalidOperationException("Promotion is in an invalid state!");
         }
@@ -77,8 +77,8 @@ public static class HRRespondsHandler
             yield return new PromotionClosedWithRejection();
             //Send message that the promotion has been rejected
             //Showing here that sendig a message can also be done with
-            //tatic IEnumerable<object> Handle signature. 
-            yield return new SendPromotionRejectedNotification(promotion.Promotee);
+            //static IEnumerable<object> Handle signature. 
+            yield return new SendPromotionRejectedNotification(state.Promotee);
             yield break;
         }
 
@@ -90,12 +90,12 @@ public static class HRRespondsHandler
 public static class CEORespondsHandler
 {
     [AggregateHandler]
-    public static (Events, OutgoingMessages) Handle(CEOResponds intent, Promotion promotion)
+    public static (Events, OutgoingMessages) Handle(CEOResponds intent, Promotion state)
     {
         var messages = new OutgoingMessages();
         var events = new Events();
 
-        if (promotion is not PassedHRApproval)
+        if (state is not PassedHRApproval)
         {
             throw new InvalidOperationException("Promotion is in an invalid state!");
         }
@@ -105,7 +105,7 @@ public static class CEORespondsHandler
             events += new RejectedByCEO(intent.DecisionMadeAt);
             events += new PromotionClosedWithRejection();
             //Send message that the promotion has been rejected
-            messages.Add(new SendPromotionRejectedNotification(promotion.Promotee));
+            messages.Add(new SendPromotionRejectedNotification(state.Promotee));
             return (events, messages);
         }
 
@@ -114,7 +114,7 @@ public static class CEORespondsHandler
         events += new PromotionClosedWithAcceptance();
 
         //send message that the Promotion has been accepted
-        messages.Add(new SendPromotionAcceptedNotification(promotion.Promotee));
+        messages.Add(new SendPromotionAcceptedNotification(state.Promotee));
 
         return (events, messages);
     }
