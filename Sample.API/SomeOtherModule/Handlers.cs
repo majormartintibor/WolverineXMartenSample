@@ -1,4 +1,4 @@
-﻿using Sample.API.PromotionModule;
+﻿using Sample.API.Contracts;
 using System.Diagnostics;
 
 namespace Sample.API.SomeOtherModule;

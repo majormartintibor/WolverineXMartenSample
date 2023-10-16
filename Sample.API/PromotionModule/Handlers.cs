@@ -1,4 +1,5 @@
 ﻿using Marten;
+using Sample.API.Contracts;
 using Wolverine;
 using Wolverine.Marten;
 using static Sample.API.PromotionModule.Promotion;
@@ -50,7 +51,7 @@ public static class SupervisorRespondsHandler
         //Just showing here some concepts you can do:
         //1. You can use method injection to inject some service you might need for some business logic
         //2. You are getting the last state reconstructed in memory from the facts
-        //3. You can apply a new fact and check the sate it will produce to make further decisions
+        //3. You can apply a new fact and check the state it will produce to make further decisions
         var newState = state.Apply(approved);
         if (newState.ApprovedBySupervisor != null)
         {

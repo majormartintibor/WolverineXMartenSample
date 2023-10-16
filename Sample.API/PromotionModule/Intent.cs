@@ -27,7 +27,3 @@ public sealed record RequestPromotionStatus(Guid PromotionId);
 public sealed record RequestPromotionDetails(Guid PromotionId);
 
 public sealed record RequestPromotionDetailsWithVersion(Guid PromotionId, int Version);
-
-public sealed record SendPromotionAcceptedNotification(string Promotee);
-
-public sealed record SendPromotionRejectedNotification(string Promotee);
