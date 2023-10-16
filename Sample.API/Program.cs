@@ -3,7 +3,7 @@ using Marten;
 using Marten.Exceptions;
 using Npgsql;
 using Sample.API;
-using Sample.API.PromotionFeature;
+using Sample.API.PromotionModule;
 using Weasel.Core;
 using Wolverine;
 using Wolverine.ErrorHandling;

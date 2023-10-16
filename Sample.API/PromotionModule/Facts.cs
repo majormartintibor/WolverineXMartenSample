@@ -1,4 +1,4 @@
-﻿namespace Sample.API.PromotionFeature;
+﻿namespace Sample.API.PromotionModule;
 
 public abstract record PromotionFact
 {

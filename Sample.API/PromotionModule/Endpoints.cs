@@ -2,7 +2,7 @@
 using Wolverine;
 using Wolverine.Http;
 
-namespace Sample.API.PromotionFeature;
+namespace Sample.API.PromotionModule;
 
 public static class Endpoints
 {

@@ -1,9 +1,9 @@
 ﻿using Marten;
 using Marten.Events.Aggregation;
 using Marten.Events.Projections;
-using static Sample.API.PromotionFeature.PromotionFact;
+using static Sample.API.PromotionModule.PromotionFact;
 
-namespace Sample.API.PromotionFeature;
+namespace Sample.API.PromotionModule;
 
 /// <summary>
 /// Serves to show the Promotee the status of their Promotion request

@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using Wolverine;
 using Wolverine.Marten;
-using static Sample.API.PromotionFeature.Promotion;
-using static Sample.API.PromotionFeature.PromotionFact;
+using static Sample.API.PromotionModule.Promotion;
+using static Sample.API.PromotionModule.PromotionFact;
 
-namespace Sample.API.PromotionFeature;
+namespace Sample.API.PromotionModule;
 
 public sealed class RequestPromotionHandler
 {
@@ -152,21 +152,5 @@ public sealed class RequestPromotionDetailsWithVersionHandler
             .AggregateStreamAsync<PromotionDetails>(request.PromotionId, request.Version);
 
         return result;
-    }
-}
-
-public static class SendPromotionAcceptedConfirmationHandler
-{
-    public static void Handle(SendPromotionAcceptedNotification sendPromotionAcceptedNotification)
-    {
-        Debug.WriteLine($"Promotion for {sendPromotionAcceptedNotification.Promotee} has been approved!");
-    }
-}
-
-public static class SendPromotionRejectedNotificationHandler
-{
-    public static void Handle(SendPromotionRejectedNotification sendPromotionRejectedNotification)
-    {        
-        Debug.WriteLine($"Promotion for {sendPromotionRejectedNotification.Promotee} has been rejected!");
     }
 }

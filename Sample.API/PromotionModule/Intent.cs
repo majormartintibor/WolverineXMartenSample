@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Sample.API.PromotionFeature;
+namespace Sample.API.PromotionModule;
 
 public sealed record RequestPromotion([Required] string Promotee);
 

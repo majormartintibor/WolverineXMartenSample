@@ -1,6 +1,6 @@
-﻿using static Sample.API.PromotionFeature.PromotionFact;
+﻿using static Sample.API.PromotionModule.PromotionFact;
 
-namespace Sample.API.PromotionFeature;
+namespace Sample.API.PromotionModule;
 
 public record Promotion
 {
