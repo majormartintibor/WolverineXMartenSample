@@ -14,15 +14,22 @@ public static class Endpoints
             "/new",
             (RequestPromotion intent, IMessageBus bus) => bus.InvokeAsync<Guid>(intent));
 
-        promotionEndpoints.MapPut(
+        //I did put an int Version property in the Reponds record below. The reason is to easily showcase
+        //concurrency exception in the demo. You could completly skip receiving the version number and
+        //Marten would just +1 it, if two different changes to the stream would happen at the smae time
+        //you would still get the concurrency check and exception, but it would be harder to demo.
+        //You could also use ETag header for optimistic concurrency:
+        //https://event-driven.io/en/how_to_use_etag_header_for_optimistic_concurrency/
+        //However this is not scope of this demo and will be ignored for now.
+        promotionEndpoints.MapPost(
             "/supervisorResponse",
             (SupervisorResponds intent, IMessageBus bus) => bus.InvokeAsync(intent));
 
-        promotionEndpoints.MapPut(
+        promotionEndpoints.MapPost(
             "/hrResponse",
             (HRResponds intent, IMessageBus bus) => bus.InvokeAsync(intent));
 
-        promotionEndpoints.MapPut(
+        promotionEndpoints.MapPost(
             "/ceoResponse",
             (CEOResponds intent, IMessageBus bus) => bus.InvokeAsync(intent));
 
