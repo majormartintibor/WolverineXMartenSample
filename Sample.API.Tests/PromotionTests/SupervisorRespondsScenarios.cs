@@ -23,7 +23,7 @@ public class SupervisorRespondsScenarios
 
         var supervisorRespondsResponse = await host.Scenario(_ =>
         {
-            _.Put.Json(new SupervisorResponds(id,1,DateTimeOffset.UtcNow, true)).ToUrl("/promotion/SupervisorResponse");
+            _.Put.Json(new SupervisorResponds(id,1,DateTimeOffset.UtcNow, true)).ToUrl("/promotion/supervisorResponse");
             _.StatusCodeShouldBeOk();
         });
 
@@ -39,7 +39,7 @@ public class SupervisorRespondsScenarios
 
         var supervisorRespondsResponse = await host.Scenario(_ =>
         {
-            _.Put.Json(new SupervisorResponds(Guid.NewGuid(), 1, DateTimeOffset.UtcNow, true)).ToUrl("/promotion/SupervisorResponse");
+            _.Put.Json(new SupervisorResponds(Guid.NewGuid(), 1, DateTimeOffset.UtcNow, true)).ToUrl("/promotion/supervisorResponse");
             _.StatusCodeShouldBe(500);
         });
     }

@@ -15,27 +15,27 @@ public static class Endpoints
             (RequestPromotion intent, IMessageBus bus) => bus.InvokeAsync<Guid>(intent));
 
         promotionEndpoints.MapPut(
-            "/SupervisorResponse",
+            "/supervisorResponse",
             (SupervisorResponds intent, IMessageBus bus) => bus.InvokeAsync(intent));
 
         promotionEndpoints.MapPut(
-            "/HRResponse",
+            "/hrResponse",
             (HRResponds intent, IMessageBus bus) => bus.InvokeAsync(intent));
 
         promotionEndpoints.MapPut(
-            "/CEOResponse",
+            "/ceoResponse",
             (CEOResponds intent, IMessageBus bus) => bus.InvokeAsync(intent));
 
         promotionEndpoints.MapGet(
-            "/Status/{id}",
+            "/status/{id}",
             (Guid Id, IMessageBus bus) => bus.InvokeAsync<PromotionStatus>(new RequestPromotionStatus(Id)));
 
         promotionEndpoints.MapGet(
-            "/Details/{id}",
+            "/details/{id}",
             (Guid Id, IMessageBus bus) => bus.InvokeAsync<PromotionDetails?>(new RequestPromotionDetails(Id)));
 
         promotionEndpoints.MapGet(
-            "/VersionedDetails",
+            "/versionedDetails",
             (Guid Id, int Version, IMessageBus bus)
                 => bus.InvokeAsync<PromotionDetails?>(new RequestPromotionDetailsWithVersion(Id, Version)));
     }
@@ -56,5 +56,5 @@ public static class Endpoints
     public static async Task<IReadOnlyList<PromotionStatus>> GetPromotionStatuses([NotBody] IQuerySession querySession)
     {
         return await querySession.Query<PromotionStatus>().ToListAsync();
-    }
+    }    
 }

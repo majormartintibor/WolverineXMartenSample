@@ -80,7 +80,4 @@ if (app.Environment.IsDevelopment())
 app.MapPromotionEndpoints();
 app.MapWolverineEndpoints();
 
-//A simplistic endpoint just to test Alba in action (in Sample.API.Tests.Sample)
-app.MapGet("/", () => "Hello World!");
-
 await app.RunAsync();
