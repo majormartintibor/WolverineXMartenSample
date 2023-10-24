@@ -7,9 +7,9 @@ using static Sample.API.PromotionModule.PromotionFact;
 
 namespace Sample.API.PromotionModule;
 
-public sealed class RequestPromotionHandler
+public static class RequestPromotionHandler
 {
-    public async Task<Guid> Handle(RequestPromotion request, IDocumentSession session)
+    public static async Task<Guid> Handle(RequestPromotion request, IDocumentSession session)
     {
         var id = Guid.NewGuid();
 
@@ -121,9 +121,9 @@ public static class CEORespondsHandler
     }
 }
 
-public sealed class RequestPromotionStatusHandler
+public static class RequestPromotionStatusHandler
 {
-    public async Task<PromotionStatus?> Handle(RequestPromotionStatus request, IQuerySession querySession)
+    public static async Task<PromotionStatus> Handle(RequestPromotionStatus request, IQuerySession querySession)
     {
         var result = await querySession
             .Query<PromotionStatus>()
@@ -133,9 +133,9 @@ public sealed class RequestPromotionStatusHandler
     }
 }
 
-public sealed class RequestPromotionDetailsHandler
+public static class RequestPromotionDetailsHandler
 {
-    public async Task<PromotionDetails?> Handle(RequestPromotionDetails request, IQuerySession querySession)
+    public static async Task<PromotionDetails> Handle(RequestPromotionDetails request, IQuerySession querySession)
     {
         var result = await querySession
             .Query<PromotionDetails>()
@@ -145,9 +145,9 @@ public sealed class RequestPromotionDetailsHandler
     }
 }
 
-public sealed class RequestPromotionDetailsWithVersionHandler
+public static class RequestPromotionDetailsWithVersionHandler
 {
-    public async Task<PromotionDetails?> Handle(RequestPromotionDetailsWithVersion request, IQuerySession querySession)
+    public static async Task<PromotionDetails> Handle(RequestPromotionDetailsWithVersion request, IQuerySession querySession)
     {
         var result = await querySession
             .Events

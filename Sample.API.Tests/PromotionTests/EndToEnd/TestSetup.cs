@@ -1,9 +1,9 @@
 ﻿using Alba;
-using Marten;
-using Microsoft.Extensions.DependencyInjection;
+//using Marten;
+//using Microsoft.Extensions.DependencyInjection;
 using Oakton;
 
-namespace Sample.API.Tests.PromotionTests;
+namespace Sample.API.Tests.PromotionTests.EndToEnd;
 [SetUpFixture]
 public class TestSetup
 {
@@ -21,7 +21,7 @@ public class TestSetup
 
         //Showing that you can put logic here that
         //executes after each HTTP execution
-        
+
         //Host.AfterEach(async h =>
         //{
         //    // Wiping out any leftover data in the database

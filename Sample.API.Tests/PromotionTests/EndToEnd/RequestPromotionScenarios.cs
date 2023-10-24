@@ -3,13 +3,13 @@ using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Sample.API.PromotionModule;
 
-namespace Sample.API.Tests.PromotionTests;
+namespace Sample.API.Tests.PromotionTests.EndToEnd;
 public class RequestPromotionScenarios
 {
     [Test]
     public async Task RequestPromotion_should_return_id()
     {
-        var host = TestSetup.GetAlbaHost();        
+        var host = TestSetup.GetAlbaHost();
 
         var response = await host.Scenario(_ =>
         {
@@ -18,7 +18,7 @@ public class RequestPromotionScenarios
         });
 
         var id = await response.ReadAsJsonAsync<Guid>();
-        
+
         Assert.That(id.ToString(), Is.Not.Empty);
 
         // Wiping out any leftover data in the database

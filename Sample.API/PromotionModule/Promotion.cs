@@ -4,7 +4,13 @@ namespace Sample.API.PromotionModule;
 
 public record Promotion
 {
-    private Promotion() { }
+    private Promotion() { } // Not to allow inheritance
+
+    /// <summary>
+    /// For testing only
+    /// </summary>
+    /// <returns>A new instance of Promotion</returns>
+    public static Promotion GetEmptyPromotion() => new();
 
     public record OpenedPromotion : Promotion;
     public record PassedSupervisorApproval : Promotion;    

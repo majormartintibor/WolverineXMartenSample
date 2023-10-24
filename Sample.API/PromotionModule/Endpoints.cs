@@ -14,7 +14,7 @@ public static class Endpoints
             "/new",
             (RequestPromotion intent, IMessageBus bus) => bus.InvokeAsync<Guid>(intent));
 
-        //I did put an int Version property in the Reponds record below. The reason is to easily showcase
+        //I did put an int Version property in the Responds record below. The reason is to easily showcase
         //concurrency exception in the demo. You could completly skip receiving the version number and
         //Marten would just +1 it, if two different changes to the stream would happen at the smae time
         //you would still get the concurrency check and exception, but it would be harder to demo.
@@ -39,12 +39,12 @@ public static class Endpoints
 
         promotionEndpoints.MapGet(
             "/details/{id}",
-            (Guid Id, IMessageBus bus) => bus.InvokeAsync<PromotionDetails?>(new RequestPromotionDetails(Id)));
+            (Guid Id, IMessageBus bus) => bus.InvokeAsync<PromotionDetails>(new RequestPromotionDetails(Id)));
 
         promotionEndpoints.MapGet(
             "/versionedDetails",
             (Guid Id, int Version, IMessageBus bus)
-                => bus.InvokeAsync<PromotionDetails?>(new RequestPromotionDetailsWithVersion(Id, Version)));
+                => bus.InvokeAsync<PromotionDetails>(new RequestPromotionDetailsWithVersion(Id, Version)));
     }
 
     /// <summary>

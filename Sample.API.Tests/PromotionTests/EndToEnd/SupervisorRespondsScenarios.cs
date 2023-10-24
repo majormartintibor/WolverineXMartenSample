@@ -3,7 +3,7 @@ using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Sample.API.PromotionModule;
 
-namespace Sample.API.Tests.PromotionTests;
+namespace Sample.API.Tests.PromotionTests.EndToEnd;
 public class SupervisorRespondsScenarios
 {
     [Test]
@@ -23,7 +23,7 @@ public class SupervisorRespondsScenarios
 
         var supervisorRespondsResponse = await host.Scenario(_ =>
         {
-            _.Put.Json(new SupervisorResponds(id,1,DateTimeOffset.UtcNow, true)).ToUrl("/promotion/supervisorResponse");
+            _.Post.Json(new SupervisorResponds(id, 1, DateTimeOffset.UtcNow, true)).ToUrl("/promotion/supervisorResponse");
             _.StatusCodeShouldBeOk();
         });
 
@@ -39,7 +39,7 @@ public class SupervisorRespondsScenarios
 
         var supervisorRespondsResponse = await host.Scenario(_ =>
         {
-            _.Put.Json(new SupervisorResponds(Guid.NewGuid(), 1, DateTimeOffset.UtcNow, true)).ToUrl("/promotion/supervisorResponse");
+            _.Post.Json(new SupervisorResponds(Guid.NewGuid(), 1, DateTimeOffset.UtcNow, true)).ToUrl("/promotion/supervisorResponse");
             _.StatusCodeShouldBe(500);
         });
     }
