@@ -1,4 +1,7 @@
-﻿using Marten;
+﻿using JasperFx.CodeGeneration.Frames;
+using Marten;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Threading.Tasks;
 using Wolverine;
 using Wolverine.Marten;
 using static Sample.API.PromotionModule.Promotion;
@@ -121,37 +124,55 @@ public static class CEORespondsHandler
 
 public static class RequestPromotionStatusHandler
 {
-    public static async Task<PromotionStatus> Handle(RequestPromotionStatus request, IQuerySession querySession)
+    public static async Task<Results<Ok<PromotionStatus>, NotFound>> Handle(
+        RequestPromotionStatus request, IQuerySession querySession)
     {
         var result = await querySession
             .Query<PromotionStatus>()
             .SingleOrDefaultAsync(p => p.Id == request.PromotionId);
 
-        return result;
+        if (result is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.Ok(result);
     }
 }
 
 public static class RequestPromotionDetailsHandler
 {
-    public static async Task<PromotionDetails> Handle(RequestPromotionDetails request, IQuerySession querySession)
+    public static async Task<Results<Ok<PromotionDetails>, NotFound>> Handle(
+        RequestPromotionDetails request, IQuerySession querySession)
     {
         var result = await querySession
             .Query<PromotionDetails>()
             .SingleOrDefaultAsync(p => p.Id == request.PromotionId);
 
-        return result;
+        if (result is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.Ok(result);
     }
 }
 
 public static class RequestPromotionDetailsWithVersionHandler
 {
-    public static async Task<PromotionDetails> Handle(RequestPromotionDetailsWithVersion request, IQuerySession querySession)
+    public static async Task<Results<Ok<PromotionDetails>, NotFound>> Handle(
+        RequestPromotionDetailsWithVersion request, IQuerySession querySession)
     {
         var result = await querySession
             .Events
             .AggregateStreamAsync<PromotionDetails>(request.PromotionId, request.Version);
 
-        return result;
+        if (result is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.Ok(result);
     }
 }
 

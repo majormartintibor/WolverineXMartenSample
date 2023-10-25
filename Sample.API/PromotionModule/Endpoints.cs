@@ -1,4 +1,5 @@
 ﻿using Marten;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Wolverine;
 using Wolverine.Http;
 
@@ -35,16 +36,16 @@ public static class Endpoints
 
         promotionEndpoints.MapGet(
             "/status/{id}",
-            (Guid Id, IMessageBus bus) => bus.InvokeAsync<PromotionStatus>(new RequestPromotionStatus(Id)));
+            (Guid Id, IMessageBus bus) => bus.InvokeAsync<Results<Ok<PromotionStatus>, NotFound>>(new RequestPromotionStatus(Id)));
 
         promotionEndpoints.MapGet(
             "/details/{id}",
-            (Guid Id, IMessageBus bus) => bus.InvokeAsync<PromotionDetails>(new RequestPromotionDetails(Id)));
+            (Guid Id, IMessageBus bus) => bus.InvokeAsync<Results<Ok<PromotionDetails>, NotFound>>(new RequestPromotionDetails(Id)));
 
         promotionEndpoints.MapGet(
             "/versionedDetails",
             (Guid Id, int Version, IMessageBus bus)
-                => bus.InvokeAsync<PromotionDetails>(new RequestPromotionDetailsWithVersion(Id, Version)));
+                => bus.InvokeAsync<Results<Ok<PromotionDetails>, NotFound>>(new RequestPromotionDetailsWithVersion(Id, Version)));
     }
 
     /// <summary>
