@@ -160,6 +160,7 @@ public static class PromotionAcceptedHandler
     [AggregateHandler]
     public static IEnumerable<object> Handle(PromotionAccepted @event, Promotion promotion)
     {
+        //In real world scenario handle the failover as you wish
         if (promotion is not ApprovedPromotion)
             yield break;
 
@@ -182,6 +183,7 @@ public static class PromotionRejectedHandler
     [AggregateHandler]
     public static IEnumerable<object> Handle(PromotionRejected @event, Promotion promotion)
     {
+        //In real world scenario handle the failover as you wish
         if (promotion is not RejectedPromotion)
             yield break;        
 
