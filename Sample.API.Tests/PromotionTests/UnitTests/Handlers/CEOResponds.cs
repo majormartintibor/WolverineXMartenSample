@@ -1,5 +1,4 @@
-﻿using Sample.API.Contracts;
-using Sample.API.PromotionModule;
+﻿using Sample.API.PromotionModule;
 using Shouldly;
 using Wolverine;
 using static Sample.API.PromotionModule.Promotion;
@@ -22,8 +21,8 @@ public class CEOResponds
         messages.Item1.ShouldHaveMessageOfType<ApprovedByCEO>()
             .ApprovedAt.ShouldBe(approvalDate);
         messages.Item1.ShouldHaveMessageOfType<PromotionClosedWithAcceptance>();
-        messages.Item2.ShouldHaveMessageOfType<SendPromotionAcceptedNotification>()
-            .Promotee.ShouldBe("TestUser");
+        messages.Item2.ShouldHaveMessageOfType<PromotionAccepted>()
+            .PromotionId.ShouldBe(promotion.Id);
     }
 
     [Test]
@@ -40,7 +39,7 @@ public class CEOResponds
         messages.Item1.ShouldHaveMessageOfType<RejectedByCEO>()
             .RejectedAt.ShouldBe(approvalDate);
         messages.Item1.ShouldHaveMessageOfType<PromotionClosedWithRejection>();
-        messages.Item2.ShouldHaveMessageOfType<SendPromotionRejectedNotification>()
-            .Promotee.ShouldBe("TestUser");
+        messages.Item2.ShouldHaveMessageOfType<PromotionRejected>()
+            .PromotionId.ShouldBe(promotion.Id);
     }
 }

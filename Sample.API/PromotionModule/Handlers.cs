@@ -1,5 +1,4 @@
 ﻿using Marten;
-using Sample.API.Contracts;
 using Wolverine;
 using Wolverine.Marten;
 using static Sample.API.PromotionModule.Promotion;
@@ -40,8 +39,8 @@ public static class SupervisorRespondsHandler
         {
             events += new RejectedBySupervisor(intent.DecisionMadeAt);
             events += new PromotionClosedWithRejection();
-            //Send message that the promotion has been rejected
-            messages.Add(new SendPromotionRejectedNotification(state.Promotee));
+            
+            messages.Add(new PromotionRejected(state.Id));
             return (events, messages);
         }
 
@@ -76,10 +75,10 @@ public static class HRRespondsHandler
         {
             yield return new RejectedByHR(intent.DecisionMadeAt);
             yield return new PromotionClosedWithRejection();
-            //Send message that the promotion has been rejected
+            
             //Showing here that sendig a message can also be done with
             //static IEnumerable<object> Handle signature. 
-            yield return new SendPromotionRejectedNotification(state.Promotee);
+            yield return new PromotionRejected(state.Id);
             yield break;
         }
 
@@ -105,17 +104,16 @@ public static class CEORespondsHandler
         {
             events += new RejectedByCEO(intent.DecisionMadeAt);
             events += new PromotionClosedWithRejection();
-            //Send message that the promotion has been rejected
-            messages.Add(new SendPromotionRejectedNotification(state.Promotee));
+           
+            messages.Add(new PromotionRejected(state.Id));
             return (events, messages);
         }
 
         ApprovedByCEO approved = new(intent.DecisionMadeAt);
         events += approved;
         events += new PromotionClosedWithAcceptance();
-
-        //send message that the Promotion has been accepted
-        messages.Add(new SendPromotionAcceptedNotification(state.Promotee));
+        
+        messages.Add(new PromotionAccepted(state.Id));
 
         return (events, messages);
     }
@@ -127,7 +125,7 @@ public static class RequestPromotionStatusHandler
     {
         var result = await querySession
             .Query<PromotionStatus>()
-            .SingleAsync(p => p.Id == request.PromotionId);
+            .SingleOrDefaultAsync(p => p.Id == request.PromotionId);
 
         return result;
     }
@@ -139,7 +137,7 @@ public static class RequestPromotionDetailsHandler
     {
         var result = await querySession
             .Query<PromotionDetails>()
-            .SingleAsync(p => p.Id == request.PromotionId);
+            .SingleOrDefaultAsync(p => p.Id == request.PromotionId);
 
         return result;
     }
@@ -154,5 +152,47 @@ public static class RequestPromotionDetailsWithVersionHandler
             .AggregateStreamAsync<PromotionDetails>(request.PromotionId, request.Version);
 
         return result;
+    }
+}
+
+public static class PromotionAcceptedHandler
+{
+    [AggregateHandler]
+    public static IEnumerable<object> Handle(PromotionAccepted @event, Promotion promotion)
+    {
+        if (promotion is not ApprovedPromotion)
+            yield break;
+
+        var controllingNotification = new Contracts.PromotionExternals.Controlling.PromotionAccepted(
+            promotion.Promotee,
+            (DateTimeOffset)promotion.ApprovedBySupervisor!,
+            (DateTimeOffset)promotion.ApprovedByHR!,
+            (DateTimeOffset)promotion.ApprovedByCEO!);
+
+        var marketingNotification = new Contracts.PromotionExternals.Marketing.PromotionAccepted(
+            promotion.Promotee);
+
+        yield return controllingNotification;
+        yield return marketingNotification;
+    }
+}
+
+public static class PromotionRejectedHandler
+{
+    [AggregateHandler]
+    public static IEnumerable<object> Handle(PromotionRejected @event, Promotion promotion)
+    {
+        if (promotion is not RejectedPromotion)
+            yield break;        
+
+        var controllingNotification = new Contracts.PromotionExternals.Controlling.PromotionRejected(
+            promotion.Promotee,
+            (DateTimeOffset)promotion.RejectedAt!);
+
+        var marketingNotification = new Contracts.PromotionExternals.Marketing.PromotionRejected(
+            promotion.Promotee);
+
+        yield return controllingNotification;
+        yield return marketingNotification;
     }
 }

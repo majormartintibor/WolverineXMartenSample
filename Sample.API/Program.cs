@@ -3,7 +3,6 @@ using Marten;
 using Marten.Exceptions;
 using Npgsql;
 using Sample.API;
-using Sample.API.Contracts;
 using Sample.API.PromotionModule;
 using Weasel.Core;
 using Wolverine;
@@ -30,14 +29,31 @@ builder.Services.AddMarten(opts =>
     .IntegrateWithWolverine()
     .EventForwardingToWolverine();
 
+//LocalQueue subscriptions could be moved to an extension method.
 builder.Host.UseWolverine(opts =>
 {
-    opts.PublishMessage<SendPromotionAcceptedNotification>()        
+    opts.PublishMessage<PromotionAccepted>()        
         .ToLocalQueue("promotionaccepted")
         .UseDurableInbox();
 
-    opts.PublishMessage<SendPromotionRejectedNotification>()
+    opts.PublishMessage<PromotionRejected>()
         .ToLocalQueue("promotionrejected")        
+        .UseDurableInbox();
+
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Controlling.PromotionAccepted>()
+        .ToLocalQueue("promotionexternals.controlling.promotionaccepted")
+        .UseDurableInbox();
+
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Controlling.PromotionRejected>()
+        .ToLocalQueue("promotionexternals.controlling.promotionrejected")
+        .UseDurableInbox();
+
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Marketing.PromotionAccepted>()
+        .ToLocalQueue("promotionexternals.marketing.promotionaccepted")
+        .UseDurableInbox();
+
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Marketing.PromotionRejected>()
+        .ToLocalQueue("promotionexternals.marketing.promotionrejected")
         .UseDurableInbox();
 
     // Retry policies if a Marten concurrency exception is encountered

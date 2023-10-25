@@ -118,8 +118,17 @@ public record Promotion
                     : this,
 
             PromotionClosedWithAcceptance =>
-                this is ApprovedPromotion approvedPromotion
-                    ? approvedPromotion with { Closed = true }
+                this is PassedCEOApproval passedCEOApproval
+                    ? new ApprovedPromotion
+                    {   Id = passedCEOApproval.Id,
+                        Version = passedCEOApproval.Version,
+                        Promotee = passedCEOApproval.Promotee,
+                        ApprovedBySupervisor = passedCEOApproval.ApprovedBySupervisor,
+                        ApprovedByHR = passedCEOApproval.ApprovedByHR,
+                        ApprovedByCEO = passedCEOApproval.ApprovedByCEO,
+                        AcceptedAt = passedCEOApproval.AcceptedAt,
+                        Closed = true 
+                    }
                     : this,
 
             PromotionClosedWithRejection =>
