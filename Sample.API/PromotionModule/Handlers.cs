@@ -1,7 +1,5 @@
-﻿using JasperFx.CodeGeneration.Frames;
-using Marten;
+﻿using Marten;
 using Microsoft.AspNetCore.Http.HttpResults;
-using System.Threading.Tasks;
 using Wolverine;
 using Wolverine.Marten;
 using static Sample.API.PromotionModule.Promotion;
