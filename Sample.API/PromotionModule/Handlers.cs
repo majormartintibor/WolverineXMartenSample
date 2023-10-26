@@ -113,7 +113,9 @@ public static class CEORespondsHandler
         ApprovedByCEO approved = new(intent.DecisionMadeAt);
         events += approved;
         events += new PromotionClosedWithAcceptance();
-        
+
+        //todo: this should be a Reaction to the PromotionClosedWithAcceptance event
+        //similar todo at PromotionRejected
         messages.Add(new PromotionAccepted(state.Id));
 
         return (events, messages);
