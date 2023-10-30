@@ -10,11 +10,11 @@ public class Promotion
         var id = Guid.NewGuid();
 
         var promotion = GetEmptyPromotion();
-        var openedPromotion = promotion.Apply(new PromotionOpened(id, "TestUser"));
+        var openPromotion = promotion.Apply(new PromotionOpened(id, "TestUser"));
 
-        Assert.IsTrue(openedPromotion is OpenPromotion);
-        Assert.That(openedPromotion.Id, Is.EqualTo(id));
-        Assert.That(openedPromotion.Promotee, Is.EqualTo("TestUser"));
+        Assert.IsTrue(openPromotion is OpenPromotion);
+        Assert.That(openPromotion.Id, Is.EqualTo(id));
+        Assert.That(openPromotion.Promotee, Is.EqualTo("TestUser"));
     }
 
     [Test]

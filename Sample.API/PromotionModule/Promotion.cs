@@ -45,12 +45,12 @@ public record Promotion
                 new OpenPromotion { Id = promotionId, Promotee = promotee },
 
             ApprovedBySupervisor(DateTimeOffset approvedAt) =>
-                this is OpenPromotion openedPromotion
+                this is OpenPromotion openPromotion
                     ? new PassedSupervisorApproval
                     { 
-                        Id = openedPromotion.Id,
-                        Version = openedPromotion.Version,
-                        Promotee = openedPromotion.Promotee,                                                
+                        Id = openPromotion.Id,
+                        Version = openPromotion.Version,
+                        Promotee = openPromotion.Promotee,                                                
                         ApprovedBySupervisor = approvedAt,
                     }
                     : this,
