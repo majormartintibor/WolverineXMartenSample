@@ -1,4 +1,5 @@
-﻿using Sample.API.PromotionModule;
+﻿using Emailing = Sample.API.Contracts.PromotionExternals.Emailing;
+using Sample.API.PromotionModule;
 using Shouldly;
 using Wolverine;
 using static Sample.API.PromotionModule.Promotion;
@@ -13,7 +14,12 @@ public class CEOResponds
         var id = Guid.NewGuid();
         var approvalDate = DateTime.UtcNow;
 
-        var promotion = new PassedHRApproval() with { Promotee = "TestUser"};
+        var promotion = new PassedHRApproval() with 
+        { 
+            Promotee = "TestUser", 
+            ApprovedBySupervisor  = DateTimeOffset.MinValue,
+            ApprovedByHR = DateTimeOffset.MinValue
+        };
         var message = new PromotionModule.CEOResponds(id, 4 /*can be anything here*/, approvalDate, true);        
 
         var messages = CEORespondsHandler.Handle(message, promotion);
@@ -21,25 +27,27 @@ public class CEOResponds
         messages.Item1.ShouldHaveMessageOfType<ApprovedByCEO>()
             .ApprovedAt.ShouldBe(approvalDate);
         messages.Item1.ShouldHaveMessageOfType<PromotionClosedWithAcceptance>();
-        messages.Item2.ShouldHaveMessageOfType<PromotionAccepted>()
-            .PromotionId.ShouldBe(promotion.Id);
+        
+        messages.Item2.ShouldHaveMessageOfType<Emailing.PromotionAccepted>()
+            .Promotee.ShouldBe(promotion.Promotee);        
     }
 
     [Test]
     public void Handle_CEOResponds_with_rejection()
     {
         var id = Guid.NewGuid();
-        var approvalDate = DateTime.UtcNow;
+        var rejectionDate = DateTime.UtcNow;
 
         var promotion = new PassedHRApproval() with { Promotee = "TestUser" };
-        var message = new PromotionModule.CEOResponds(id, 4, approvalDate, false);        
+        var message = new PromotionModule.CEOResponds(id, 4, rejectionDate, false);        
 
         var messages = CEORespondsHandler.Handle(message, promotion);
 
         messages.Item1.ShouldHaveMessageOfType<RejectedByCEO>()
-            .RejectedAt.ShouldBe(approvalDate);
-        messages.Item1.ShouldHaveMessageOfType<PromotionClosedWithRejection>();
-        messages.Item2.ShouldHaveMessageOfType<PromotionRejected>()
-            .PromotionId.ShouldBe(promotion.Id);
+            .RejectedAt.ShouldBe(rejectionDate);
+        messages.Item1.ShouldHaveMessageOfType<PromotionClosedWithRejection>();        
+
+        messages.Item2.ShouldHaveMessageOfType<Emailing.PromotionRejected>()
+            .Promotee.ShouldBe(promotion.Promotee);        
     }
 }

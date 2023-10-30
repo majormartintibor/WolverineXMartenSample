@@ -39,9 +39,17 @@ public static class SupervisorRespondsHandler
         if (!intent.Verdict)
         {
             events += new RejectedBySupervisor(intent.DecisionMadeAt);
-            events += new PromotionClosedWithRejection();
+
+            //There will be a reaction to this internal/private event you can find
+            //in the PromotionClosedWithRejectionHandler. It will react to this fact
+            //and do whatever logic, you can inject whatever service to the handler.
+            //The advantage is that you can keep the "Decider" simple and "clean"...
+            events += new PromotionClosedWithRejection(state.Id);
             
-            messages.Add(new PromotionRejected(state.Id));
+            //...or you can do it like shown here and just directly send a message to the queue.
+            //This example is simple, but maybe you would need services, have more complex logic, etc
+            //and that would make it harder to reason about this method.
+            messages.Add(new Contracts.PromotionExternals.Emailing.PromotionRejected(state.Promotee));
             return (events, messages);
         }
 
@@ -75,11 +83,11 @@ public static class HRRespondsHandler
         if (!intent.Verdict)
         {
             yield return new RejectedByHR(intent.DecisionMadeAt);
-            yield return new PromotionClosedWithRejection();
+            yield return new PromotionClosedWithRejection(state.Id);
             
             //Showing here that sendig a message can also be done with
             //static IEnumerable<object> Handle signature. 
-            yield return new PromotionRejected(state.Id);
+            yield return new Contracts.PromotionExternals.Emailing.PromotionRejected(state.Promotee);
             yield break;
         }
 
@@ -104,19 +112,17 @@ public static class CEORespondsHandler
         if (!intent.Verdict)
         {
             events += new RejectedByCEO(intent.DecisionMadeAt);
-            events += new PromotionClosedWithRejection();
+            events += new PromotionClosedWithRejection(state.Id);
            
-            messages.Add(new PromotionRejected(state.Id));
+            messages.Add(new Contracts.PromotionExternals.Emailing.PromotionRejected(state.Promotee));
             return (events, messages);
         }
 
         ApprovedByCEO approved = new(intent.DecisionMadeAt);
         events += approved;
-        events += new PromotionClosedWithAcceptance();
-
-        //todo: this should be a Reaction to the PromotionClosedWithAcceptance event
-        //similar todo at PromotionRejected
-        messages.Add(new PromotionAccepted(state.Id));
+        events += new PromotionClosedWithAcceptance(state.Id);
+        
+        messages.Add(new Contracts.PromotionExternals.Emailing.PromotionAccepted(state.Promotee));
 
         return (events, messages);
     }
@@ -179,7 +185,7 @@ public static class RequestPromotionDetailsWithVersionHandler
 public static class PromotionAcceptedHandler
 {
     [AggregateHandler]
-    public static IEnumerable<object> Handle(PromotionAccepted @event, Promotion promotion)
+    public static IEnumerable<object> Handle(PromotionClosedWithAcceptance @event, Promotion promotion)
     {
         //In real world scenario handle the failover as you wish
         if (promotion is not ApprovedPromotion)
@@ -199,14 +205,14 @@ public static class PromotionAcceptedHandler
     }
 }
 
-public static class PromotionRejectedHandler
+public static class PromotionClosedWithRejectionHandler
 {
     [AggregateHandler]
-    public static IEnumerable<object> Handle(PromotionRejected @event, Promotion promotion)
+    public static IEnumerable<object> Handle(PromotionClosedWithRejection @event, Promotion promotion)
     {
         //In real world scenario handle the failover as you wish
         if (promotion is not RejectedPromotion)
-            yield break;        
+            yield break;
 
         var controllingNotification = new Contracts.PromotionExternals.Controlling.PromotionRejected(
             promotion.Promotee,

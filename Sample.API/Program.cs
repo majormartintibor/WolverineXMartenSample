@@ -32,14 +32,6 @@ builder.Services.AddMarten(opts =>
 //LocalQueue subscriptions could be moved to an extension method.
 builder.Host.UseWolverine(opts =>
 {
-    opts.PublishMessage<PromotionAccepted>()        
-        .ToLocalQueue("promotionaccepted")
-        .UseDurableInbox();
-
-    opts.PublishMessage<PromotionRejected>()
-        .ToLocalQueue("promotionrejected")        
-        .UseDurableInbox();
-
     opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Controlling.PromotionAccepted>()
         .ToLocalQueue("promotionexternals.controlling.promotionaccepted")
         .UseDurableInbox();
@@ -54,6 +46,14 @@ builder.Host.UseWolverine(opts =>
 
     opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Marketing.PromotionRejected>()
         .ToLocalQueue("promotionexternals.marketing.promotionrejected")
+        .UseDurableInbox();
+
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Emailing.PromotionRejected>()
+        .ToLocalQueue("promotionexternals.emailing.promotionrejected")
+        .UseDurableInbox();
+
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Emailing.PromotionAccepted>()
+        .ToLocalQueue("promotionexternals.emailing.promotionaccepted")
         .UseDurableInbox();
 
     // Retry policies if a Marten concurrency exception is encountered
