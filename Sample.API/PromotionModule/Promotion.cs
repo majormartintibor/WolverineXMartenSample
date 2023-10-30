@@ -12,10 +12,10 @@ public record Promotion
     /// <returns>A new instance of Promotion</returns>
     public static Promotion GetEmptyPromotion() => new();
 
-    public record OpenPromotion : Promotion;
-    public record PassedSupervisorApproval : Promotion;    
-    public record PassedHRApproval : Promotion;    
-    public record PassedCEOApproval : Promotion;    
+    public record OpenPromotion : Promotion; //could be WaitingForSupervisor
+    public record PassedSupervisorApproval : Promotion; //could be WaitingForHR
+    public record PassedHRApproval : Promotion; //could be WaitingForCEO
+    public record PassedCEOApproval : Promotion; //could be WaitingForClosure    
     public sealed record ApprovedPromotion : Promotion;
     public sealed record RejectedPromotion : Promotion;
     
