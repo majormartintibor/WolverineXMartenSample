@@ -3,8 +3,14 @@ using FluentValidation.Results;
 using JasperFx.Core;
 using Wolverine.FluentValidation;
 
-namespace Sample.API;
+namespace Sample.API.PromotionModule;
 
+/// <summary>
+/// Validators get called before the coad reaches the Handler.
+/// This way you can trust your commands and don't need to pollute
+/// your handlers with guard clauses.
+/// If validation fails a ValidationException gets thrown.
+/// </summary>
 public sealed class RequestPromotionValidator : AbstractValidator<RequestPromotion>
 {
     public RequestPromotionValidator()

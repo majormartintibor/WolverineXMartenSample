@@ -1,11 +1,14 @@
 using JasperFx.Core;
 using Marten;
 using Marten.Exceptions;
+using Npgsql;
 using Sample.API;
+using Sample.API.PromotionModule;
 using Weasel.Core;
 using Wolverine;
 using Wolverine.ErrorHandling;
 using Wolverine.FluentValidation;
+using Wolverine.Http;
 using Wolverine.Marten;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,23 +20,58 @@ builder.Services.AddMarten(opts =>
     opts.Connection(connectionString);
 
     opts.AutoCreateSchemaObjects = AutoCreate.All;
-    opts.DatabaseSchemaName = "promotion";
+    opts.DatabaseSchemaName = "promotion";    
 
     opts.AddPromotionProjections();
 }).UseLightweightSessions()
 
     // Adding the Wolverine integration for Marten.
-    .IntegrateWithWolverine();
+    .IntegrateWithWolverine()
+    .EventForwardingToWolverine();
 
+//LocalQueue subscriptions could be moved to an extension method.
 builder.Host.UseWolverine(opts =>
 {
+    opts.PublishMessage<PromotionAccepted>()        
+        .ToLocalQueue("promotionaccepted")
+        .UseDurableInbox();
+
+    opts.PublishMessage<PromotionRejected>()
+        .ToLocalQueue("promotionrejected")        
+        .UseDurableInbox();
+
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Controlling.PromotionAccepted>()
+        .ToLocalQueue("promotionexternals.controlling.promotionaccepted")
+        .UseDurableInbox();
+
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Controlling.PromotionRejected>()
+        .ToLocalQueue("promotionexternals.controlling.promotionrejected")
+        .UseDurableInbox();
+
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Marketing.PromotionAccepted>()
+        .ToLocalQueue("promotionexternals.marketing.promotionaccepted")
+        .UseDurableInbox();
+
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Marketing.PromotionRejected>()
+        .ToLocalQueue("promotionexternals.marketing.promotionrejected")
+        .UseDurableInbox();
+
     // Retry policies if a Marten concurrency exception is encountered
     opts.OnException<ConcurrencyException>()
         .RetryOnce()
         .Then.RetryWithCooldown(100.Milliseconds(), 250.Milliseconds())
-    .Then.Discard();
+        .Then.Discard();
 
-    opts.UseFluentValidation();
+    //Retry for infrastructure hiccups
+    opts.Policies.OnException<NpgsqlException>()
+        .RetryWithCooldown(50.Milliseconds(), 100.Milliseconds(), 250.Milliseconds());    
+
+    // Automatic usage of transactional middleware as 
+    // Wolverine recognizes that an HTTP endpoint or message handler
+    // persists data
+    opts.Policies.AutoApplyTransactions();
+
+    opts.UseFluentValidation();    
 
     opts.Services.AddSingleton(typeof(IFailureAction<>), typeof(CustomFailureAction<>));
 });
@@ -44,6 +82,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IDateTimeOffsetProvider, DateTimeOffsetProvider>();
+builder.Services.AddScoped<ISomeRandomService, SomeRandomService>();
 
 var app = builder.Build();
 
@@ -54,8 +93,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
 app.MapPromotionEndpoints();
+app.MapWolverineEndpoints();
 
 await app.RunAsync();
