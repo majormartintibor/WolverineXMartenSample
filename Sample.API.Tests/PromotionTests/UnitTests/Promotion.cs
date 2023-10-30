@@ -12,7 +12,7 @@ public class Promotion
         var promotion = GetEmptyPromotion();
         var openedPromotion = promotion.Apply(new PromotionOpened(id, "TestUser"));
 
-        Assert.IsTrue(openedPromotion is OpenedPromotion);
+        Assert.IsTrue(openedPromotion is OpenPromotion);
         Assert.That(openedPromotion.Id, Is.EqualTo(id));
         Assert.That(openedPromotion.Promotee, Is.EqualTo("TestUser"));
     }
@@ -22,7 +22,7 @@ public class Promotion
     {
         var approvedAt = DateTimeOffset.UtcNow;
 
-        var promotion = new OpenedPromotion() with { Id = Guid.NewGuid(), Promotee = "TestUser" };
+        var promotion = new OpenPromotion() with { Id = Guid.NewGuid(), Promotee = "TestUser" };
         var passedSupervisorApproval = promotion.Apply(new ApprovedBySupervisor(approvedAt));
 
         Assert.IsTrue(passedSupervisorApproval is PassedSupervisorApproval);

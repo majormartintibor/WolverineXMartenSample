@@ -29,32 +29,32 @@ public static class SupervisorRespondsHandler
         SupervisorResponds intent, Promotion state, ISomeRandomService someRandomService)
     {
         var messages = new OutgoingMessages();
-        var events = new Events();
+        var facts = new Events();
 
-        if (state is not OpenedPromotion)
+        if (state is not OpenPromotion)
         {
             throw new InvalidOperationException("Promotion is in an invalid state!");
         }
 
         if (!intent.Verdict)
         {
-            events += new RejectedBySupervisor(intent.DecisionMadeAt);
+            facts += new RejectedBySupervisor(intent.DecisionMadeAt);
 
             //There will be a reaction to this internal/private event you can find
             //in the PromotionClosedWithRejectionHandler. It will react to this fact
             //and do whatever logic, you can inject whatever service to the handler.
             //The advantage is that you can keep the "Decider" simple and "clean"...
-            events += new PromotionClosedWithRejection(state.Id);
+            facts += new PromotionClosedWithRejection(state.Id);
             
             //...or you can do it like shown here and just directly send a message to the queue.
             //This example is simple, but maybe you would need services, have more complex logic, etc
             //and that would make it harder to reason about this method.
             messages.Add(new Contracts.PromotionExternals.Emailing.PromotionRejected(state.Promotee));
-            return (events, messages);
+            return (facts, messages);
         }
 
         ApprovedBySupervisor approved = new(intent.DecisionMadeAt);
-        events += approved;
+        facts += approved;
 
         //Just showing here some concepts you can do:
         //1. You can use method injection to inject some service you might need for some business logic
@@ -66,7 +66,7 @@ public static class SupervisorRespondsHandler
             someRandomService.DoSomething();
         }
 
-        return (events, messages);
+        return (facts, messages);
     }
 }
 
@@ -102,7 +102,7 @@ public static class CEORespondsHandler
     public static (Events, OutgoingMessages) Handle(CEOResponds intent, Promotion state)
     {
         var messages = new OutgoingMessages();
-        var events = new Events();
+        var facts = new Events();
 
         if (state is not PassedHRApproval)
         {
@@ -111,20 +111,20 @@ public static class CEORespondsHandler
 
         if (!intent.Verdict)
         {
-            events += new RejectedByCEO(intent.DecisionMadeAt);
-            events += new PromotionClosedWithRejection(state.Id);
+            facts += new RejectedByCEO(intent.DecisionMadeAt);
+            facts += new PromotionClosedWithRejection(state.Id);
            
             messages.Add(new Contracts.PromotionExternals.Emailing.PromotionRejected(state.Promotee));
-            return (events, messages);
+            return (facts, messages);
         }
 
         ApprovedByCEO approved = new(intent.DecisionMadeAt);
-        events += approved;
-        events += new PromotionClosedWithAcceptance(state.Id);
+        facts += approved;
+        facts += new PromotionClosedWithAcceptance(state.Id);
         
         messages.Add(new Contracts.PromotionExternals.Emailing.PromotionAccepted(state.Promotee));
 
-        return (events, messages);
+        return (facts, messages);
     }
 }
 

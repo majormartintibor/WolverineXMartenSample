@@ -12,7 +12,7 @@ public record Promotion
     /// <returns>A new instance of Promotion</returns>
     public static Promotion GetEmptyPromotion() => new();
 
-    public record OpenedPromotion : Promotion;
+    public record OpenPromotion : Promotion;
     public record PassedSupervisorApproval : Promotion;    
     public record PassedHRApproval : Promotion;    
     public record PassedCEOApproval : Promotion;    
@@ -42,10 +42,10 @@ public record Promotion
         @fact switch
         {
             PromotionOpened(Guid promotionId, string promotee) =>
-                new OpenedPromotion { Id = promotionId, Promotee = promotee },
+                new OpenPromotion { Id = promotionId, Promotee = promotee },
 
             ApprovedBySupervisor(DateTimeOffset approvedAt) =>
-                this is OpenedPromotion openedPromotion
+                this is OpenPromotion openedPromotion
                     ? new PassedSupervisorApproval
                     { 
                         Id = openedPromotion.Id,
@@ -82,7 +82,7 @@ public record Promotion
                     : this,
 
             RejectedBySupervisor(DateTimeOffset rejectedAt) =>
-                this is OpenedPromotion openedPromotion
+                this is OpenPromotion openedPromotion
                     ? new RejectedPromotion
                     {
                         Id = openedPromotion.Id,
