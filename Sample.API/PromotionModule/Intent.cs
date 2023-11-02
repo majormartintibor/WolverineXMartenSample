@@ -10,6 +10,11 @@ public sealed record SupervisorResponds(
     DateTimeOffset DecisionMadeAt,
     bool Verdict);
 
+public sealed record SupervisorRespondsWithoutId(    
+    int Version,
+    DateTimeOffset DecisionMadeAt,
+    bool Verdict);
+
 public sealed record HRResponds(
     Guid PromotionId,
     int Version,

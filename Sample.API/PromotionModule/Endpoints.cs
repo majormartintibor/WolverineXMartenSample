@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Wolverine;
 using Wolverine.Http;
+using Wolverine.Http.Marten;
+using static Sample.API.PromotionModule.Promotion;
+using static Sample.API.PromotionModule.PromotionFact;
 
 namespace Sample.API.PromotionModule;
 
@@ -46,6 +49,45 @@ public static class Endpoints
             "/versionedDetails",
             (Guid Id, int Version, IMessageBus bus)
                 => bus.InvokeAsync<Results<Ok<PromotionDetails>, NotFound>>(new RequestPromotionDetailsWithVersion(Id, Version)));
+    }
+
+    /// <summary>
+    /// This is an example for even less ceremony. With Wolverine 1.1 you can now get the Aggregate
+    /// directly based on the supplied aggreagteID from the route. Similar as with the Aggregate Handlers
+    /// the return values will be appended to the stream or sent to the appropriate queue.
+    /// In case the aggregate does not yet exist a 404 response is returned.
+    /// </summary>
+    /// <param name="intent"></param>
+    /// <param name="state"></param>
+    /// <param name="someRandomService"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    [WolverinePost("/promotion/supervisorResponseNew/{promotionId}"), EmptyResponse]
+    public static IEnumerable<object> SupervisorResponds(
+        SupervisorRespondsWithoutId intent,
+        [Aggregate] Promotion state,
+        ISomeRandomService someRandomService)
+    {
+        if (state is not OpenPromotion)
+        {
+            throw new InvalidOperationException("Promotion is in an invalid state!");
+        }
+
+        if (!intent.Verdict)
+        {
+            yield return new RejectedBySupervisor(intent.DecisionMadeAt);
+            yield return new PromotionClosedWithRejection(state.Id);
+            yield return new Contracts.PromotionExternals.Emailing.PromotionRejected(state.Promotee);
+        }
+
+        ApprovedBySupervisor approved = new(intent.DecisionMadeAt);
+        yield return approved;
+
+        var newState = state.Apply(approved);
+        if (newState.ApprovedBySupervisor != null)
+        {
+            someRandomService.DoSomething();
+        }
     }
 
     /// <summary>

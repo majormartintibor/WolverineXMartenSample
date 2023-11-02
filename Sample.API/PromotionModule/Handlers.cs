@@ -24,6 +24,9 @@ public static class RequestPromotionHandler
 
 public static class SupervisorRespondsHandler
 {
+   
+    ///See the SupervisorResponds Wolverine Endpoint in the Endpoints.cs for an
+    // even simpler implementation with less ceremony  
     [AggregateHandler]
     public static (Events, OutgoingMessages) Handle(
         SupervisorResponds intent, Promotion state, ISomeRandomService someRandomService)
