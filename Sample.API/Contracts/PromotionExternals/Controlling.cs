@@ -1,11 +1,11 @@
 ﻿namespace Sample.API.Contracts.PromotionExternals.Controlling;
 
-public sealed record PromotionAccepted(
+public sealed record DoControllingStuffWhenPromotionAccepted(
     string Promotee, 
     DateTimeOffset AcceptedBySupervisorDate,
     DateTimeOffset AcceptedByHRDate,
     DateTimeOffset AcceptedByCEODate);
 
-public sealed record PromotionRejected(
+public sealed record DoControllingStuffWhenPromotionRejected(
     string Promotee,
     DateTimeOffset RejectionDate);

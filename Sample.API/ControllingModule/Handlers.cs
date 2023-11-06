@@ -3,9 +3,9 @@ using System.Diagnostics;
 
 namespace Sample.API.ControllingModule;
 
-public static class PromotionAcceptedHandler
+public static class DoControllingStuffWhenPromotionAcceptedHandler
 {
-    public static void Handle(PromotionAccepted promotionAccepted)
+    public static void Handle(DoControllingStuffWhenPromotionAccepted promotionAccepted)
     {
         Debug.WriteLine($"Promotion for {promotionAccepted.Promotee} has been approved! " +
             $"Approval times: Supervisor - {promotionAccepted.AcceptedBySupervisorDate}, " +
@@ -14,9 +14,9 @@ public static class PromotionAcceptedHandler
     }
 }
 
-public static class PromotionRejectedHandler
+public static class DoControllingStuffWhenPromotionRejectedHandler
 {
-    public static void Handle(PromotionRejected promotionRejected)
+    public static void Handle(DoControllingStuffWhenPromotionRejected promotionRejected)
     {
         Debug.WriteLine($"Promotion for {promotionRejected.Promotee} has been rejected at {promotionRejected.RejectionDate}!");
     }

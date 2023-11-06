@@ -1,5 +1,5 @@
 ﻿namespace Sample.API.Contracts.PromotionExternals.Emailing;
 
-public sealed record PromotionAccepted(string Promotee);
+public sealed record DoEmailingStuffWhenPromotionAccepted(string Promotee);
 
-public sealed record PromotionRejected(string Promotee);
+public sealed record DoEmailingStuffWhenPromotionRejected(string Promotee);

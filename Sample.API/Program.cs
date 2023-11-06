@@ -32,27 +32,27 @@ builder.Services.AddMarten(opts =>
 //LocalQueue subscriptions could be moved to an extension method.
 builder.Host.UseWolverine(opts =>
 {
-    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Controlling.PromotionAccepted>()
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Controlling.DoControllingStuffWhenPromotionAccepted>()
         .ToLocalQueue("promotionexternals.controlling.promotionaccepted")
         .UseDurableInbox();
 
-    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Controlling.PromotionRejected>()
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Controlling.DoControllingStuffWhenPromotionRejected>()
         .ToLocalQueue("promotionexternals.controlling.promotionrejected")
         .UseDurableInbox();
 
-    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Marketing.PromotionAccepted>()
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Marketing.DoMarketingStuffWhenPromotionAccepted>()
         .ToLocalQueue("promotionexternals.marketing.promotionaccepted")
         .UseDurableInbox();
 
-    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Marketing.PromotionRejected>()
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Marketing.DoMarketingStuffWhenPromotionRejected>()
         .ToLocalQueue("promotionexternals.marketing.promotionrejected")
         .UseDurableInbox();
 
-    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Emailing.PromotionRejected>()
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Emailing.DoEmailingStuffWhenPromotionRejected>()
         .ToLocalQueue("promotionexternals.emailing.promotionrejected")
         .UseDurableInbox();
 
-    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Emailing.PromotionAccepted>()
+    opts.PublishMessage<Sample.API.Contracts.PromotionExternals.Emailing.DoEmailingStuffWhenPromotionAccepted>()
         .ToLocalQueue("promotionexternals.emailing.promotionaccepted")
         .UseDurableInbox();
 

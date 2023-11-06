@@ -28,7 +28,7 @@ public class CEOResponds
             .ApprovedAt.ShouldBe(approvalDate);
         messages.Item1.ShouldHaveMessageOfType<PromotionClosedWithAcceptance>();
         
-        messages.Item2.ShouldHaveMessageOfType<Emailing.PromotionAccepted>()
+        messages.Item2.ShouldHaveMessageOfType<Emailing.DoEmailingStuffWhenPromotionAccepted>()
             .Promotee.ShouldBe(promotion.Promotee);        
     }
 
@@ -47,7 +47,7 @@ public class CEOResponds
             .RejectedAt.ShouldBe(rejectionDate);
         messages.Item1.ShouldHaveMessageOfType<PromotionClosedWithRejection>();        
 
-        messages.Item2.ShouldHaveMessageOfType<Emailing.PromotionRejected>()
+        messages.Item2.ShouldHaveMessageOfType<Emailing.DoEmailingStuffWhenPromotionRejected>()
             .Promotee.ShouldBe(promotion.Promotee);        
     }
 }

@@ -3,17 +3,17 @@ using System.Diagnostics;
 
 namespace Sample.API.EmailingModule;
 
-public static class PromotionAcceptedHandler
+public static class DoEmailingStuffWhenPromotionAcceptedHandler
 {
-    public static void Handle(PromotionAccepted sendPromotionAcceptedNotification)
+    public static void Handle(DoEmailingStuffWhenPromotionAccepted sendPromotionAcceptedNotification)
     {
         Debug.WriteLine($"Acceptance Email sent for for {sendPromotionAcceptedNotification.Promotee}!");
     }
 }
 
-public static class PromotionRejectedHandler
+public static class DoEmailingStuffWhenPromotionRejectedHandler
 {
-    public static void Handle(PromotionRejected sendPromotionRejectedNotification)
+    public static void Handle(DoEmailingStuffWhenPromotionRejected sendPromotionRejectedNotification)
     {
         Debug.WriteLine($"Rejection Email sent for for {sendPromotionRejectedNotification.Promotee}!");
     }

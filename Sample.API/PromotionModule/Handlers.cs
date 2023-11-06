@@ -49,7 +49,7 @@ public static class SupervisorRespondsHandler
             //...or you can do it like shown here and just directly send a message to the queue.
             //This example is simple, but maybe you would need services, have more complex logic, etc
             //and that would make it harder to reason about this method.
-            messages.Add(new Contracts.PromotionExternals.Emailing.PromotionRejected(state.Promotee));
+            messages.Add(new Contracts.PromotionExternals.Emailing.DoEmailingStuffWhenPromotionRejected(state.Promotee));
             return (facts, messages);
         }
 
@@ -87,7 +87,7 @@ public static class HRRespondsHandler
             
             //Showing here that sendig a message can also be done with
             //static IEnumerable<object> Handle signature. 
-            yield return new Contracts.PromotionExternals.Emailing.PromotionRejected(state.Promotee);
+            yield return new Contracts.PromotionExternals.Emailing.DoEmailingStuffWhenPromotionRejected(state.Promotee);
             yield break;
         }
 
@@ -114,7 +114,7 @@ public static class CEORespondsHandler
             facts += new RejectedByCEO(intent.DecisionMadeAt);
             facts += new PromotionClosedWithRejection(state.Id);
            
-            messages.Add(new Contracts.PromotionExternals.Emailing.PromotionRejected(state.Promotee));
+            messages.Add(new Contracts.PromotionExternals.Emailing.DoEmailingStuffWhenPromotionRejected(state.Promotee));
             return (facts, messages);
         }
 
@@ -122,7 +122,7 @@ public static class CEORespondsHandler
         facts += approved;
         facts += new PromotionClosedWithAcceptance(state.Id);
         
-        messages.Add(new Contracts.PromotionExternals.Emailing.PromotionAccepted(state.Promotee));
+        messages.Add(new Contracts.PromotionExternals.Emailing.DoEmailingStuffWhenPromotionAccepted(state.Promotee));
 
         return (facts, messages);
     }
@@ -182,7 +182,7 @@ public static class RequestPromotionDetailsWithVersionHandler
     }
 }
 
-public static class PromotionAcceptedHandler
+public static class PromotionClosedWithAcceptanceHandler
 {
     [AggregateHandler]
     public static IEnumerable<object> Handle(PromotionClosedWithAcceptance @event, Promotion promotion)
@@ -191,13 +191,13 @@ public static class PromotionAcceptedHandler
         if (promotion is not ApprovedPromotion)
             yield break;
 
-        var controllingNotification = new Contracts.PromotionExternals.Controlling.PromotionAccepted(
+        var controllingNotification = new Contracts.PromotionExternals.Controlling.DoControllingStuffWhenPromotionAccepted(
             promotion.Promotee,
             (DateTimeOffset)promotion.ApprovedBySupervisor!,
             (DateTimeOffset)promotion.ApprovedByHR!,
             (DateTimeOffset)promotion.ApprovedByCEO!);
 
-        var marketingNotification = new Contracts.PromotionExternals.Marketing.PromotionAccepted(
+        var marketingNotification = new Contracts.PromotionExternals.Marketing.DoMarketingStuffWhenPromotionAccepted(
             promotion.Promotee);
 
         yield return controllingNotification;
@@ -205,6 +205,10 @@ public static class PromotionAcceptedHandler
     }
 }
 
+/// <summary>
+/// TODO: The contracts should be probably be renamed
+/// as these are comamnds not events!
+/// </summary>
 public static class PromotionClosedWithRejectionHandler
 {
     [AggregateHandler]
@@ -214,11 +218,11 @@ public static class PromotionClosedWithRejectionHandler
         if (promotion is not RejectedPromotion)
             yield break;
 
-        var controllingNotification = new Contracts.PromotionExternals.Controlling.PromotionRejected(
+        var controllingNotification = new Contracts.PromotionExternals.Controlling.DoControllingStuffWhenPromotionRejected(
             promotion.Promotee,
             (DateTimeOffset)promotion.RejectedAt!);
 
-        var marketingNotification = new Contracts.PromotionExternals.Marketing.PromotionRejected(
+        var marketingNotification = new Contracts.PromotionExternals.Marketing.DoMarketingStuffWhenPromotionRejected(
             promotion.Promotee);
 
         yield return controllingNotification;
