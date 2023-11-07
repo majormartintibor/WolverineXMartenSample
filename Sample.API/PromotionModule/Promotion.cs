@@ -4,14 +4,8 @@ namespace Sample.API.PromotionModule;
 
 public record Promotion
 {
-    private Promotion() { } // Not to allow inheritance
-
-    /// <summary>
-    /// For testing only
-    /// </summary>
-    /// <returns>A new instance of Promotion</returns>
-    public static Promotion GetEmptyPromotion() => new();
-
+    private Promotion() { } // Not to allow inheritance    
+    
     public record OpenPromotion : Promotion; //could be WaitingForSupervisor
     public record PassedSupervisorApproval : Promotion; //could be WaitingForHR
     public record PassedHRApproval : Promotion; //could be WaitingForCEO
@@ -30,6 +24,9 @@ public record Promotion
     public DateTimeOffset? ApprovedBySupervisor { get; set; }
     public DateTimeOffset? ApprovedByHR { get; set; }
     public DateTimeOffset? ApprovedByCEO { get; set; }
+
+    public static Promotion GetEmptyPromotion() => new();
+
 
     /// <summary>
     /// By Marten convention this method needs to be named Apply.
