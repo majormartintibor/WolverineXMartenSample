@@ -205,10 +205,6 @@ public static class PromotionClosedWithAcceptanceHandler
     }
 }
 
-/// <summary>
-/// TODO: The contracts should be probably be renamed
-/// as these are comamnds not events!
-/// </summary>
 public static class PromotionClosedWithRejectionHandler
 {
     [AggregateHandler]
