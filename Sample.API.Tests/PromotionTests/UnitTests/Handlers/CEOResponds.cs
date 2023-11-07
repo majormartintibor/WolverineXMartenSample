@@ -11,43 +11,53 @@ public class CEOResponds
     [Test]
     public void Handle_CEOResponds_with_approval()
     {
+        //Arrange
         var id = Guid.NewGuid();
         var approvalDate = DateTime.UtcNow;
-
         var promotion = new PassedHRApproval() with 
         { 
             Promotee = "TestUser", 
             ApprovedBySupervisor  = DateTimeOffset.MinValue,
             ApprovedByHR = DateTimeOffset.MinValue
-        };
-        var message = new PromotionModule.CEOResponds(id, 4 /*can be anything here*/, approvalDate, true);        
+        };        
+        var message = new PromotionModule.CEOResponds(id, default, approvalDate, true);        
 
-        var messages = CEORespondsHandler.Handle(message, promotion);
+        //Act
+        var result = CEORespondsHandler.Handle(message, promotion);
 
-        messages.Item1.ShouldHaveMessageOfType<ApprovedByCEO>()
+        //Assert
+        var events = result.Item1;
+        var outgoingMessages = result.Item2;
+
+        events.ShouldHaveMessageOfType<ApprovedByCEO>()
             .ApprovedAt.ShouldBe(approvalDate);
-        messages.Item1.ShouldHaveMessageOfType<PromotionClosedWithAcceptance>();
-        
-        messages.Item2.ShouldHaveMessageOfType<Emailing.DoEmailingStuffWhenPromotionAccepted>()
+        events.ShouldHaveMessageOfType<PromotionClosedWithAcceptance>();
+
+        outgoingMessages.ShouldHaveMessageOfType<Emailing.DoEmailingStuffWhenPromotionAccepted>()
             .Promotee.ShouldBe(promotion.Promotee);        
     }
 
     [Test]
     public void Handle_CEOResponds_with_rejection()
     {
+        //Arrange
         var id = Guid.NewGuid();
         var rejectionDate = DateTime.UtcNow;
-
         var promotion = new PassedHRApproval() with { Promotee = "TestUser" };
-        var message = new PromotionModule.CEOResponds(id, 4, rejectionDate, false);        
+        var message = new PromotionModule.CEOResponds(id, default, rejectionDate, false);        
 
-        var messages = CEORespondsHandler.Handle(message, promotion);
+        //Act
+        var result = CEORespondsHandler.Handle(message, promotion);
 
-        messages.Item1.ShouldHaveMessageOfType<RejectedByCEO>()
+        //Assert
+        var events = result.Item1;
+        var outgoingMessages = result.Item2;
+
+        events.ShouldHaveMessageOfType<RejectedByCEO>()
             .RejectedAt.ShouldBe(rejectionDate);
-        messages.Item1.ShouldHaveMessageOfType<PromotionClosedWithRejection>();        
+        events.ShouldHaveMessageOfType<PromotionClosedWithRejection>();
 
-        messages.Item2.ShouldHaveMessageOfType<Emailing.DoEmailingStuffWhenPromotionRejected>()
+        outgoingMessages.ShouldHaveMessageOfType<Emailing.DoEmailingStuffWhenPromotionRejected>()
             .Promotee.ShouldBe(promotion.Promotee);        
     }
 }

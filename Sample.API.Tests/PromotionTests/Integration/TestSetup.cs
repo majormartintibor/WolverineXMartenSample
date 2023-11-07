@@ -3,7 +3,7 @@
 //using Microsoft.Extensions.DependencyInjection;
 using Oakton;
 
-namespace Sample.API.Tests.PromotionTests.EndToEnd;
+namespace Sample.API.Tests.PromotionTests.Integration;
 [SetUpFixture]
 public class TestSetup
 {

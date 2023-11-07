@@ -3,7 +3,7 @@ using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Sample.API.PromotionModule;
 
-namespace Sample.API.Tests.PromotionTests.EndToEnd;
+namespace Sample.API.Tests.PromotionTests.Integration;
 public class RequestPromotionScenarios
 {
     [Test]

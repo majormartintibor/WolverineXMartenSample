@@ -6,10 +6,10 @@ public record Promotion
 {
     private Promotion() { } // Not to allow inheritance    
     
-    public record OpenPromotion : Promotion; //could be WaitingForSupervisor
-    public record PassedSupervisorApproval : Promotion; //could be WaitingForHR
-    public record PassedHRApproval : Promotion; //could be WaitingForCEO
-    public record PassedCEOApproval : Promotion; //could be WaitingForClosure    
+    public sealed record OpenPromotion : Promotion; //could be WaitingForSupervisor
+    public sealed record PassedSupervisorApproval : Promotion; //could be WaitingForHR
+    public sealed record PassedHRApproval : Promotion; //could be WaitingForCEO
+    public sealed record PassedCEOApproval : Promotion; //could be WaitingForClosure    
     public sealed record ApprovedPromotion : Promotion;
     public sealed record RejectedPromotion : Promotion;
     

@@ -5,7 +5,7 @@ using Sample.API.PromotionModule;
 using static Sample.API.PromotionModule.Promotion;
 using static Sample.API.PromotionModule.PromotionFact;
 
-namespace Sample.API.Tests.PromotionTests.EndToEnd;
+namespace Sample.API.Tests.PromotionTests.Integration;
 
 public class HRRespondsScenarios
 {
@@ -45,7 +45,7 @@ public class HRRespondsScenarios
         });
 
         var promotion = await session.Events.AggregateStreamAsync<Promotion>(id);
-        Assert.IsTrue(promotion is RejectedPromotion);
+        Assert.That(promotion is RejectedPromotion, Is.True);
 
         await store.Advanced.ResetAllData();
     }
