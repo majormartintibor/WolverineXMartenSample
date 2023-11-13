@@ -22,13 +22,10 @@ public class CEOResponds
         };        
         var message = new PromotionModule.CEOResponds(id, default, approvalDate, true);        
 
-        //Act
-        var result = CEORespondsHandler.Handle(message, promotion);
+        //Act       
+        (var events, var outgoingMessages) = CEORespondsHandler.Handle(message, promotion);
 
         //Assert
-        var events = result.Item1;
-        var outgoingMessages = result.Item2;
-
         events.ShouldHaveMessageOfType<ApprovedByCEO>()
             .ApprovedAt.ShouldBe(approvalDate);
         events.ShouldHaveMessageOfType<PromotionClosedWithAcceptance>();
@@ -44,15 +41,12 @@ public class CEOResponds
         var id = Guid.NewGuid();
         var rejectionDate = DateTime.UtcNow;
         var promotion = new PassedHRApproval() with { Promotee = "TestUser" };
-        var message = new PromotionModule.CEOResponds(id, default, rejectionDate, false);        
+        var message = new PromotionModule.CEOResponds(id, default, rejectionDate, false);
 
         //Act
-        var result = CEORespondsHandler.Handle(message, promotion);
+        (var events, var outgoingMessages) = CEORespondsHandler.Handle(message, promotion);
 
         //Assert
-        var events = result.Item1;
-        var outgoingMessages = result.Item2;
-
         events.ShouldHaveMessageOfType<RejectedByCEO>()
             .RejectedAt.ShouldBe(rejectionDate);
         events.ShouldHaveMessageOfType<PromotionClosedWithRejection>();
